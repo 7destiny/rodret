@@ -21,13 +21,13 @@ local IASZone = (require "st.zigbee.zcl.clusters").IASZone
 -- issue offline
 local function no_offline(self,device)
   if device:get_model() == "RODRET Dimmer" then
-      device.thread:call_on_schedule( 300,
+      device.thread:call_on_schedule( 180,
       function ()
-        local last_state = device:get_latest_state("main", capabilities.button.ID, capabilities.button.zigbee_button.NAME)
-        if last_state == "active" then
-          device:emit_event(capabilities.button.zigbee_button.active())
+        local last_state = device:get_latest_state("main", capabilities.button.ID, capabilities.button.button.NAME)
+		if last_state == "pushed" then
+          device:emit_event(capabilities.button.button.pushed())
         else
-          device:emit_event(capabilities.button.zigbee_button.inactive())
+          device:emit_event(capabilities.button.button.held())
         end
       end
       ,'Refresh state')
