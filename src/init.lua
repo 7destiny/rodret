@@ -18,22 +18,6 @@ local defaults = require "st.zigbee.defaults"
 local constants = require "st.zigbee.constants"
 local IASZone = (require "st.zigbee.zcl.clusters").IASZone
 
--- issue offline
-local function no_offline(self,device)
-  if device:get_model() == "RODRET Dimmer" then
-      device.thread:call_on_schedule( 180,
-      function ()
-        local last_state = device:get_latest_state("main", capabilities.button.ID, capabilities.button.button.NAME)
-		if last_state == "pushed" then
-          device:emit_event(capabilities.button.button.pushed())
-        else
-          device:emit_event(capabilities.button.button.held())
-        end
-      end
-      ,'Refresh state')
-  end  
-end
-
 local generate_event_from_zone_status = function(driver, device, zone_status, zb_rx)
   local event
   local additional_fields = {
@@ -85,8 +69,6 @@ local function added_handler(self, device)
   device:emit_event(capabilities.button.supportedButtonValues({"pushed","held","double"}, {visibility = { displayed = false }}))
   device:emit_event(capabilities.button.numberOfButtons({value = 1}, {visibility = { displayed = false }}))
   device:emit_event(capabilities.button.button.pushed({state_change = false}))
-  -- issue offline devices
-  no_offline(self, device)
 end
 
 local zigbee_button_driver_template = {
